@@ -8,7 +8,10 @@
     <div class="content-form-page">
         <div class="row">
             <div class="col-md-7 col-sm-7">
-                <form action="/btltw_04/login" method="post" class="form-horizontal form-without-legend" role="form">
+            <c:if test="${alert != null}">
+					<h3 class="alert alert danger">${alert}</h3>
+				</c:if>
+                <form action="${pageContext.request.contextPath}/login" method="post" class="form-horizontal form-without-legend" role="form">
                     <div class="form-group">
                         <label for="username" class="col-lg-4 control-label">Username <span class="require">*</span></label>
                         <div class="col-lg-8">

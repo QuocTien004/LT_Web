@@ -62,14 +62,6 @@ public class UserServiceImplement implements IUserService {
 		return userDAO.checkExistPhone(phone);
 	}
 
-	
-	
-	public static void main(String[] agrs) {
-		IUserService test = new UserServiceImplement();
-		test.register("z", "1", "z@", "NTD", "113");
-	}
-	
-
 	@Override
 	public boolean updateProfile(String fullname, String phone, String images, String username) {
 		if (!userDAO.checkExistUsername(username)) {

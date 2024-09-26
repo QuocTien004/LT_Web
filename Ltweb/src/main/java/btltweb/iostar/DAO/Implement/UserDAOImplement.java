@@ -9,6 +9,8 @@ import java.util.List;
 
 import btltweb.iostar.DAO.IUserDAO;
 import btltweb.iostar.Models.UserModel;
+import btltweb.iostar.DAO.Implement.*;
+import btltweb.iostar.DAO.Implement.*;
 import btltweb.iostar.Configs.DBConnectMySQL;
 
 public class UserDAOImplement implements IUserDAO {
@@ -25,9 +27,9 @@ public class UserDAOImplement implements IUserDAO {
 			ps = conn.prepareStatement(query);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				list.add(new UserModel(rs.getInt("user_id"), rs.getString("user_name"), rs.getString("user_password"),
-						rs.getString("user_email"), rs.getString("user_fullname"), rs.getString("user_avatar"),
-						rs.getInt("user_role_id"), rs.getString("user_phone"), rs.getDate("user_datecreate")));
+				list.add(new UserModel(rs.getInt("id"), rs.getString("username"), rs.getString("password"),
+						rs.getString("email"), rs.getString("fullname"), rs.getString("images"),
+						rs.getInt("roleid"), rs.getString("phone"), rs.getDate("createDate")));
 			}
 			return list;
 		} catch (Exception e) {
@@ -38,7 +40,7 @@ public class UserDAOImplement implements IUserDAO {
 
 	@Override
 	public UserModel findById(int id) {
-		String query = "SELECT * FROM users where user_id = ? ";
+		String query = "SELECT * FROM users where id = ? ";
 		UserModel user = null;
 		try {
 			conn = DBConnectMySQL.getDatabaseConnection();
@@ -46,9 +48,9 @@ public class UserDAOImplement implements IUserDAO {
 			ps.setInt(1, id);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				user = new UserModel(rs.getInt("user_id"), rs.getString("user_name"), rs.getString("user_password"),
-						rs.getString("user_email"), rs.getString("user_fullname"), rs.getString("user_avatar"),
-						rs.getInt("user_role_id"), rs.getString("user_phone"), rs.getDate("user_datecreate"));
+				user = new UserModel(rs.getInt("id"), rs.getString("username"), rs.getString("password"),
+						rs.getString("email"), rs.getString("fullname"), rs.getString("images"),
+						rs.getInt("roleid"), rs.getString("phone"), rs.getDate("createDate"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -59,8 +61,8 @@ public class UserDAOImplement implements IUserDAO {
 	@Override
 	public void insert(UserModel user) {
 		List<UserModel> users = findAll();
-		String query = "insert into users (user_name, user_password, user_email,"
-				+ "user_fullname,user_avatar, user_role_id,user_phone,user_datecreate)" + " values (?,?,?,?,?,?,?,?)";
+		String query = "insert into users (username, password, email,"
+				+ "fullname, images, roleid, phone, createDate)" + " values (?,?,?,?,?,?,?,?)";
 		for (UserModel existingUser : users) {
 			if (existingUser.getUserName().equals(user.getUserName())) {
 				break;
@@ -86,7 +88,7 @@ public class UserDAOImplement implements IUserDAO {
 	}
 
 	public void updatePassword(String email, String newPassword) {
-		String query = "update users set user_password = ? where user_email= ?";
+		String query = "update users set password = ? where email= ?";
 
 		try {
 			conn = DBConnectMySQL.getDatabaseConnection();
@@ -102,7 +104,7 @@ public class UserDAOImplement implements IUserDAO {
 
 	@Override
 	public UserModel findByUserName(String username) {
-		String query = "SELECT * FROM users where user_name = ? ";
+		String query = "SELECT * FROM users where username = ? ";
 		UserModel user = null;
 		try {
 			conn = DBConnectMySQL.getDatabaseConnection();
@@ -110,9 +112,9 @@ public class UserDAOImplement implements IUserDAO {
 			ps.setString(1, username);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				user = new UserModel(rs.getInt("user_id"), rs.getString("user_name"), rs.getString("user_password"),
-						rs.getString("user_email"), rs.getString("user_fullname"), rs.getString("user_avatar"),
-						rs.getInt("user_role_id"), rs.getString("user_phone"), rs.getDate("user_datecreate"));
+				user = new UserModel(rs.getInt("id"), rs.getString("username"), rs.getString("password"),
+						rs.getString("email"), rs.getString("fullname"), rs.getString("images"),
+						rs.getInt("roleid"), rs.getString("phone"), rs.getDate("createDate"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -124,7 +126,7 @@ public class UserDAOImplement implements IUserDAO {
 	@Override
 	public boolean checkExistEmail(String email) {
 		boolean duplicate = false;
-		String query = "select * from users where user_email = ?";
+		String query = "select * from users where email = ?";
 		try {
 			conn = DBConnectMySQL.getDatabaseConnection();
 			ps = conn.prepareStatement(query);
@@ -143,7 +145,7 @@ public class UserDAOImplement implements IUserDAO {
 	@Override
 	public boolean checkExistUsername(String username) {
 		boolean duplicate = false;
-		String query = "select * from users where user_name = ?";
+		String query = "select * from users where username = ?";
 		try {
 			conn = DBConnectMySQL.getDatabaseConnection();
 			ps = conn.prepareStatement(query);
@@ -163,7 +165,7 @@ public class UserDAOImplement implements IUserDAO {
 	@Override
 	public boolean checkExistPhone(String phone) {
 		boolean duplicate = false;
-		String query = "select * from users where user_phone = ?";
+		String query = "select * from users where phone = ?";
 		try {
 			conn = DBConnectMySQL.getDatabaseConnection();
 			ps = conn.prepareStatement(query);
@@ -181,7 +183,7 @@ public class UserDAOImplement implements IUserDAO {
 	
 
 	public void updateProfile(String fullname, String phone, String path_image, String username) {
-		String query = "update users set user_fullname = ?, user_phone = ?, user_avatar = ? where user_name = ?";
+		String query = "update users set fullname = ?, phone = ?, images = ? where username = ?";
 
 		try {
 			conn = DBConnectMySQL.getDatabaseConnection();
@@ -197,9 +199,15 @@ public class UserDAOImplement implements IUserDAO {
 		}
 	}
 
-	public static void main(String[] agrs) {
-		IUserDAO test = new UserDAOImplement();
-		test.updateProfile("Dang Gia Sang", "12313131", "sang,jsp","sang");
+	public static void main(String[] args) {
+		try {
+			UserDAOImplement userDao = new UserDAOImplement();
+			new DBConnectMySQL();
+			System.out.println(userDao.findAll());
+		   }catch(Exception e) {
+			   e.printStackTrace();
+		   }
 	}
+
 
 }
